@@ -15,9 +15,9 @@
 
 			each item in data.items
 				item
-					title= item.title
-					link= item.url
-					pubDate= item.pubDate
-					content:encoded <![CDATA[ !{item.content} ]]
+					title= item.item.title
+					link= item.item.url
+					pubDate= new Date(item.item.created_utc * 1000)
+					content:encoded <![CDATA[!{item.content}]]
 					
 				
