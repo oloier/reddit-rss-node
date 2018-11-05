@@ -20,7 +20,6 @@ app.get('/r/:subreddit/time/:time/:limit', async (req, res) => {
 		let limit = req.params.limit
 
 		const feed = `https://www.reddit.com/r/${subreddit}/top/.json?sort=top&t=${time}&limit=${limit}`
-		// console.log(`URL feed: ${feed}`)
 
 		let json = await fetchGet(feed)
 		let jsonArray = json.data.children 
