@@ -61,6 +61,9 @@ const prepareFeedItems = (rdtPost) => {
 		if (item.post_hint.indexOf(':video') !== -1) 
 			item.content = _.unescape(item.secure_embed)
 		
+		// v.redd.it is totally broken and awful. Not worth it.
+		if (item.link.indexOf('/v.redd.it/') !== -1) item.link = item.permalink
+
 		// direct image embedding
 		let exts = ['.jpg', '.png', '.webp', '.gif', '.jpeg']
 		if (item.post_hint.indexOf('image') !== -1 
@@ -73,7 +76,8 @@ const prepareFeedItems = (rdtPost) => {
 			item.content = item.selftext
 
 		// hide NSFW content, or any content for a straight link
-		if (item.nsfw || item.post_hint.indexOf('link')) item.content = ''
+		if (item.nsfw) item.content = ''
+		if (item.post_hint.indexOf('link') !== -1) item.content = ''
 
 		items.push(item)
 	})
