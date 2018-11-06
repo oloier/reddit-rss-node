@@ -13,6 +13,10 @@ app.set('views', path.join(__dirname, '/views'))
 
 const RssItem = require('./lib/rssitem')
 
+app.get('/:subr', async (req, res) => {
+	
+})
+
 app.get('/r/:subreddit/time/:time/:limit', async (req, res) => {
 	try {
 		let subreddit = req.params.subreddit
@@ -27,6 +31,7 @@ app.get('/r/:subreddit/time/:time/:limit', async (req, res) => {
 		let rssObjects = []
 		jsonArray.forEach((entry) => {
 			let rss = new RssItem(entry)
+			rss.init()
 			rssObjects.push(rss)
 		})
 

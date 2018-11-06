@@ -18,7 +18,7 @@
 					title= item.item.title
 					link= item.item.url
 					pubDate= new Date(item.item.created_utc * 1000)
-					content:encoded !{item.content}
-					//- content:encoded <![CDATA[!{item.content}]]
+					//- content:encoded !{item.content}
+					content <![CDATA[!{item.content}]]
 					
 				
