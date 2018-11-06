@@ -13,7 +13,7 @@ app.get('/r/:subreddit/top-:time/limit-:limit', async (req, res) => {
 		const limit = req.params.limit
 
 		const feed = `https://www.reddit.com/r/${subreddit}/top/.json?sort=top&t=${time}&limit=${limit}`
-
+		console.info(feed)
 		const json = await fetchGet(feed)
 		const rssObjects = prepareFeedItems(json)
 		const rssMomma = {
@@ -62,6 +62,9 @@ const prepareFeedItems = (rdtPost) => {
 		if (item.post_hint.indexOf(':video') !== -1) 
 			item.content = _.unescape(item.secure_embed)
 		
+		if (item.link.indexOf('/v.redd.it/') !== -1) item.link = item.permalink
+
+
 		// direct image embedding
 		let exts = ['.jpg', '.png', '.webp', '.gif', '.jpeg']
 		if (item.post_hint.indexOf('image') !== -1 
@@ -74,7 +77,8 @@ const prepareFeedItems = (rdtPost) => {
 			item.content = item.selftext
 
 		// hide NSFW content, or any content for a straight link
-		if (item.nsfw || item.post_hint.indexOf('link')) item.content = ''
+		if (item.nsfw) item.content = ''
+		if (item.post_hint.indexOf('link') !== -1) item.content = 'WOW'
 
 		items.push(item)
 	})
