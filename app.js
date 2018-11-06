@@ -1,17 +1,14 @@
 require('dotenv').config()
 const fs = require('fs')
-const express = require('express')
-const app = express()
+const fastify = require('fastify')()
 const _ = require('lodash')
 const fetch = require('node-fetch')
-app.disable('x-powered-by')
 
-app.get('/r/:subreddit/top-:time/limit-:limit', async (req, res) => {
+fastify.get('/r/:subreddit/top-:time/limit-:limit', async (request, resp) => {
 	try {
-		const subreddit = req.params.subreddit
-		const time = req.params.time
-		const limit = req.params.limit
-
+		const subreddit = request.params.subreddit
+		const time = request.params.time
+		const limit = request.params.limit
 		const feed = `https://www.reddit.com/r/${subreddit}/top/.json?sort=top&t=${time}&limit=${limit}`
 
 		const json = await fetchGet(feed)
@@ -23,11 +20,12 @@ app.get('/r/:subreddit/top-:time/limit-:limit', async (req, res) => {
 		}
 
 		// invoke lodash template string, send as response
-		res.set('Content-Type', 'application/rss+xml')
-		res.send(render('rss', rssMomma))
+		resp.header('Content-Type', 'application/rss+xml')
+		resp.send(render('rss', rssMomma))
 	} catch (ex) {
 		console.error(ex)
 	}
+
 })
 
 const fetchGet = async (url) => {
@@ -59,16 +57,16 @@ const prepareFeedItems = (rdtPost) => {
 		}
 
 		// video oembed? yes please. thx reddit.
-		if (item.post_hint.indexOf(':video') !== -1) 
+		if (item.post_hint.indexOf(':video') !== -1)
 			item.content = _.unescape(item.secure_embed)
-		
+
 		// v.redd.it is totally broken and awful. Not worth it.
 		if (item.link.indexOf('/v.redd.it/') !== -1) item.link = item.permalink
 
 		// direct image embedding
 		let exts = ['.jpg', '.png', '.webp', '.gif', '.jpeg']
-		if (item.post_hint.indexOf('image') !== -1 
-			|| exts.indexOf(item.link) !== -1) {
+		if (item.post_hint.indexOf('image') !== -1 ||
+			exts.indexOf(item.link) !== -1) {
 			item.content = `<img src="${item.link}" alt="">`
 		}
 
@@ -90,5 +88,7 @@ function render(view, ctx = {}) {
 	return _.template(fs.readFileSync(`./views/${view}.html`))(ctx)
 }
 
-// module.exports = app
-app.listen(process.env.PORT)
+fastify.listen(4000, (err, address) => {
+	if (err) throw err
+	fastify.log.info(`server listening on ${address}`)
+})
