@@ -4,6 +4,7 @@ const express = require('express')
 const app = express()
 const _ = require('lodash')
 const fetch = require('node-fetch')
+app.disable('x-powered-by')
 
 app.get('/r/:subreddit/top-:time/limit-:limit', async (req, res) => {
 	try {
