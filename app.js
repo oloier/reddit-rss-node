@@ -6,9 +6,9 @@ const fetch = require('node-fetch')
 
 fastify.get('/r/:subreddit/top-:time/limit-:limit', async (request, resp) => {
 	try {
-		const subreddit = request.params.subreddit
-		const time = request.params.time
-		const limit = request.params.limit
+		const subreddit = request.params.subreddit || 'all'
+		const time = request.params.time || 'day'
+		const limit = request.params.limit || 5
 		const feed = `https://www.reddit.com/r/${subreddit}/top/.json?sort=top&t=${time}&limit=${limit}`
 
 		const json = await fetchGet(feed)
@@ -88,7 +88,7 @@ function render(view, ctx = {}) {
 	return _.template(fs.readFileSync(`./views/${view}.html`))(ctx)
 }
 
-fastify.listen(4000, (err, address) => {
+fastify.listen(process.env.PORT, (err, address) => {
 	if (err) throw err
 	fastify.log.info(`server listening on ${address}`)
 })
