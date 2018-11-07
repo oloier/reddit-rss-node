@@ -90,5 +90,6 @@ function render(view, ctx = {}) {
 
 fastify.listen(process.env.PORT, (err, address) => {
 	if (err) throw err
+	console.info(`server listening on ${address}`)
 	fastify.log.info(`server listening on ${address}`)
 })
