@@ -4,13 +4,20 @@ const fastify = require('fastify')()
 const _ = require('lodash')
 const fetch = require('node-fetch')
 
-fastify.get('/r/:subreddit/top-:time/limit-:limit', async (request, resp) => {
+
+fastify.get('/:subreddit/top-:time/limit-:limit', async (request, resp) => {
+	resp.redirect('/r/all/top-day/limit-10')
+})
+
+fastify.get('/:subreddit/top-:time/limit-:limit', async (request, resp) => {
 	try {
 		const subreddit = request.params.subreddit || 'all'
 		const time = request.params.time || 'day'
 		const limit = request.params.limit || 5
+		
 		const feed = `https://www.reddit.com/r/${subreddit}/top/.json?sort=top&t=${time}&limit=${limit}`
-		console.info(`URL request: ${feed}`)
+		// console.info(`URL request: ${feed}`)
+
 		const json = await fetchGet(feed)
 		const rssObjects = prepareFeedItems(json)
 		const rssMomma = {
