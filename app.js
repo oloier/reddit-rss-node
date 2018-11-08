@@ -5,7 +5,7 @@ const _ = require('lodash')
 const fetch = require('node-fetch')
 
 
-fastify.get('/:subreddit/top-:time/limit-:limit', async (request, resp) => {
+fastify.get('/', async (request, resp) => {
 	resp.redirect('/r/all/top-day/limit-10')
 })
 
