@@ -70,14 +70,25 @@ const prepareFeedItems = (rdtPost) => {
 			items: rdtPost.data.children,
 			nsfw: (!!child.data.over_18),
 			secure_embed: child.data.secure_media_embed.content,
-			oembed: (child.data.media && child.data.media.oembed) ? child.data.media.oembed.html : '',
 			selftext: child.data.selftext_html,
 			post_hint: child.data.post_hint,
 			num_comments: child.data.num_comments,
+			thumbnail: {
+				url: child.data.thumbnail,
+				width: child.data.thumbnail_width,
+				height: child.data.thumbnail_height
+			},
 			is_reddit_video: child.data.is_reddit_media_domain,
 			reddit_video_url: (child.data.media && child.data.media.reddit_video) 
 				? child.data.media.reddit_video.fallback_url : null
+				// ? {
+				// 	url: child.data.media.reddit_video.fallback_url.child,
+				// 	width: ,
+				// 	height: 
+				// } : null
 		}
+		
+		// oembed: (child.data.media && child.data.media.oembed) ? child.data.media.oembed.html : '',
 
 		// video oembed? yes please. thx reddit.
 		// const videoTemplate = _.template('<iframe width=100% height=100% frameborder=0 src="data:text/html,<video src=\'<%= url %>\' controls muted autoplay loop playsinline>"></video></iframe>')

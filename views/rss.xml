@@ -18,6 +18,11 @@
 			<title>${item.title}</title>
 			<link>${item.url}</link>
 			<pubDate>${item.pubDate}</pubDate>
+			<% if (typeof(item.thumbnail) !== undefined) { %>
+				<media:content>
+					<media:thumbnail url="${item.thumbnail.url}" width="${item.thumbnail.width}" height="${item.thumbnail.height}"/>
+				</media:content>
+			<% } %>
 			<content:encoded><![CDATA[
 				<div><a href="${item.permalink}">View Comments, (${item.num_comments} comments?)</a></div>
 				<p><small><b>${item.domain}</b> &ndash; posted by <em>${item.author}</em></small></p>
