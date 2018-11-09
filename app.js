@@ -9,7 +9,7 @@ fastify.get('/', (request, resp) => {
 	resp.redirect('/r/all/top-day/limit-10')
 })
 
-fastify.get('/v/:url', (request, resp) => {
+fastify.get('/v::url', (request, resp) => {
 	const url = decodeURIComponent(request.params.url) || ''
 
 	resp.header('content-type', 'text/html; charset=utf-8')
@@ -84,7 +84,8 @@ const prepareFeedItems = (rdtPost) => {
 		// const videoTemplate = _.template('<video src="<%= url %>" controls="true" muted autoplay="true" loop playsinline="true"></video>')
 		const videoTemplate = (url) => {
 			const vurl = encodeURIComponent(url)
-			return `<iframe width=100% height=100% frameborder=0 src="https://oloier.com/r/v/${vurl}"></iframe>`
+			return '<iframe width=100% height=100% frameborder=0 '
+			+ `src="https://oloier.com/r/v:${vurl}"></iframe>`
 		}
 
 		if (item.post_hint && item.post_hint.indexOf(':video') !== -1) {
@@ -112,7 +113,6 @@ const prepareFeedItems = (rdtPost) => {
 			// replace gifv with <video> embed of mp4 source URL
 			if (item.domain.indexOf('imgur.com') !== -1 && item.url.indexOf('.gifv' !== -1))
 				item.content = videoTemplate(item.url.replace('.gifv', '.mp4'))
-				// item.content = `<video controls muted autoplay loop src="${item.url.replace('.gifv', '.mp4')}">`
 		}
 		
 		items.push(item)
