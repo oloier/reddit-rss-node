@@ -9,7 +9,7 @@ fastify.get('/', (request, resp) => {
 	resp.redirect('/r/all/top-day/limit-10')
 })
 
-fastify.get('/v::url', (request, resp) => {
+fastify.get('/v/:url', (request, resp) => {
 	const url = decodeURIComponent(request.params.url) || ''
 
 	resp.header('content-type', 'text/html; charset=utf-8')
@@ -81,7 +81,7 @@ const prepareFeedItems = (rdtPost) => {
 
 		// video oembed? yes please. thx reddit.
 		// const videoTemplate = _.template('<iframe width=100% height=100% frameborder=0 src="data:text/html,<video src=\'<%= url %>\' controls muted autoplay loop playsinline>"></video></iframe>')
-		const videoTemplate = _.template('<video src="<%= url %>" controls="true" muted autoplay="true" loop playsinline="true"></video>')
+		const videoTemplate = _.template('<video src="<%= url %>" width=800 height=600 controls muted autoplay loop playsinline></video>')
 		// const videoTemplate = (url) => {
 		// 	const vurl = encodeURIComponent(url)
 		// 	return '<iframe width=100% height=100% frameborder=0 '
