@@ -68,8 +68,9 @@ const prepareFeedItems = (rdtPost) => {
 		}
 
 		// video oembed? yes please. thx reddit.
-		const videoTemplate = _.template('<iframe width=100% height=100% frameborder=0 src="data:text/html,<video src=\'<%= url %>\' controls muted autoplay loop playsinline>"></video></iframe>')
+		// const videoTemplate = _.template('<iframe width=100% height=100% frameborder=0 src="data:text/html,<video src=\'<%= url %>\' controls muted autoplay loop playsinline>"></video></iframe>')
 		// const videoTemplate = _.template('<video src="<%= url %>" controls="true" muted autoplay="true" loop playsinline="true"></video>')
+		const videoTemplate = _.template('<iframe width=100% height=100% frameborder=0 src="data:text/html,<video src=\'<%= url %>\' controls muted autoplay loop playsinline>"></video>"></iframe>')
 		if (item.post_hint && item.post_hint.indexOf(':video') !== -1) {
 			if (item.is_reddit_video && item.reddit_video_url)
 				item.content = videoTemplate({url: item.reddit_video_url})

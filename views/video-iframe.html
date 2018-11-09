@@ -1,0 +1,40 @@
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>Video embed</title>
+	<style type="text/css">
+		* {margin: 0; padding:0; box-sizing: border-box}
+		main {
+			position: relative;
+			background-size: cover;
+			background-position: 50% 50%;
+			height: 100vh;
+			z-index: 0;
+		}
+		main video {
+			-webkit-transform: translateX(-50%) translateY(-50%);
+			-moz-transform: translateX(-50%) translateY(-50%);
+			-ms-transform: translateX(-50%) translateY(-50%);
+			-o-transform: translateX(-50%) translateY(-50%);
+			transform: translateX(-50%) translateY(-50%);
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			min-width: 100%;
+			min-height: 100%;
+			width: auto;
+			height: auto;
+			z-index: -100;
+		}
+	</style>
+</head>
+<body>
+	<main>
+		<video controls muted autoplay loop playsinline>
+			<source src="https://d2v9y0dukr6mq2.cloudfront.net/video/preview/abstract-rainbow_wjpctkdes__PM.mp4">
+		</video>
+	</main>
+</body>
+</html>
