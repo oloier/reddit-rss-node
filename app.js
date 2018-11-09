@@ -1,24 +1,24 @@
 require('dotenv').config()
 const fs = require('fs')
-const fastify = require('fastify')()
+const fastify = require('fastify')({logger: false})
 const _ = require('lodash')
 const fetch = require('node-fetch')
 
 
-fastify.get('/', async (request, resp) => {
+fastify.get('/', (request, resp) => {
 	resp.redirect('/r/all/top-day/limit-10')
 })
 
-fastify.get('/v/:url', async (request, resp) => {
-	const vurl = request.params.url || ''
-	// invoke lodash template string, send as responsenpm s
+fastify.get('/v/:url', (request, resp) => {
+	const url = _.unescape(request.params.url) || ''
+
 	resp.header('content-type', 'text/html; charset=utf-8')
-	resp.header('content-encoding', 'br')
 	resp.header('cache-control', 'no-cache')
 	resp.header('x-xss-protection', '1')
 	resp.header('x-content-type-options', 'nosniff')
 	resp.header('strict-transport-security', 'max-age=31536000')
-	resp.send(render('video-iframe', {url: _.unescape(vurl)}))
+	// invoke lodash template string, send as response
+	resp.send(render('video-iframe.html', {url}))
 })
 
 fastify.get('/:subreddit/top-:time/limit-:limit', async (request, resp) => {
@@ -40,7 +40,7 @@ fastify.get('/:subreddit/top-:time/limit-:limit', async (request, resp) => {
 
 		// invoke lodash template string, send as responsenpm s
 		resp.header('content-type', 'application/rss+xml')
-		resp.send(render('rss', rssMomma))
+		resp.send(render('rss.xml', rssMomma))
 	} catch (ex) {
 		console.error(ex)
 	}
@@ -82,7 +82,7 @@ const prepareFeedItems = (rdtPost) => {
 		// video oembed? yes please. thx reddit.
 		// const videoTemplate = _.template('<iframe width=100% height=100% frameborder=0 src="data:text/html,<video src=\'<%= url %>\' controls muted autoplay loop playsinline>"></video></iframe>')
 		// const videoTemplate = _.template('<video src="<%= url %>" controls="true" muted autoplay="true" loop playsinline="true"></video>')
-		const videoTemplate = _.template('<iframe width=100% height=100% frameborder=0 src="https://oloier.com/r/v/<%= _.escape(url) %>"></iframe>')
+		const videoTemplate = (url) => {return `<iframe width=100% height=100% frameborder=0 src="https://oloier.com/r/v/${_.escape(url)}"></iframe>`}
 		if (item.post_hint && item.post_hint.indexOf(':video') !== -1) {
 			if (item.is_reddit_video && item.reddit_video_url)
 				item.content = videoTemplate({url: item.reddit_video_url})
@@ -121,7 +121,7 @@ const prepareFeedItems = (rdtPost) => {
 
 // lodash template compilation
 function render(view, ctx = {}) {
-	return _.template(fs.readFileSync(`./views/${view}.html`))(ctx)
+	return _.template(fs.readFileSync(`./views/${view}`))(ctx)
 }
 
 fastify.listen(process.env.PORT, (err, address) => {
