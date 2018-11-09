@@ -52,7 +52,7 @@ const prepareFeedItems = (rdtPost) => {
 			domain: child.data.domain,
 			title: child.data.title,
 			pubDate: new Date(child.data.created_utc * 1000),
-			link: child.data.url,
+			url: child.data.url,
 			author: child.data.author,
 			permalink: `https://reddit.com${child.data.permalink}`,
 			items: rdtPost.data.children,
@@ -60,21 +60,29 @@ const prepareFeedItems = (rdtPost) => {
 			secure_embed: child.data.secure_media_embed.content,
 			oembed: (child.data.media && child.data.media.oembed) ? child.data.media.oembed.html : '',
 			selftext: child.data.selftext_html,
-			post_hint: child.data.post_hint
+			post_hint: child.data.post_hint,
+			num_comments: child.data.num_comments,
+			is_reddit_video: child.data.is_reddit_media_domain,
+			reddit_video_url: (child.data.media &&child.data.media.reddit_video) 
+				? child.data.media.reddit_video.fallback_url : null
 		}
 
 		// video oembed? yes please. thx reddit.
-		if (item.post_hint && item.post_hint.indexOf(':video') !== -1)
-			item.content = _.unescape(item.secure_embed)
+		const videoTemplate = _.template('<video src="<%= url %>" controls muted autoplay loop playsinline>')
+		if (item.post_hint && item.post_hint.indexOf(':video') !== -1) {
+			if (item.is_reddit_video && item.reddit_video_url)
+				item.content = videoTemplate({url: item.reddit_video_url})
+			else item.content = _.unescape(item.secure_embed)
+		}
 
 		// v.redd.it is totally broken and awful. Not worth it.
-		if (item.link.indexOf('/v.redd.it/') !== -1) item.link = item.permalink
+		if (item.url.indexOf('/v.redd.it/') !== -1) item.url = item.permalink
 
 		// direct image embedding
 		let exts = ['.jpg', '.png', '.webp', '.gif', '.jpeg']
 		if (item.post_hint && item.post_hint.indexOf('image') !== -1 ||
-			exts.indexOf(item.link) !== -1) {
-			item.content = `<img src="${item.link}" alt="">`
+			exts.indexOf(item.url) !== -1) {
+			item.content = `<img src="${item.url}" alt="">`
 		}
 
 		// do your best, self text... who goddamn cares.
@@ -83,8 +91,15 @@ const prepareFeedItems = (rdtPost) => {
 
 		// hide NSFW content, or any content for a straight link
 		if (item.nsfw) item.content = ''
-		if (item.post_hint && item.post_hint.indexOf('link') !== -1) item.content = ''
 
+		// individual other site exceptions, imgur, instagram, etc.
+		if (item.post_hint && item.post_hint.indexOf('link') !== -1) {
+			// replace gifv with <video> embed of mp4 source URL
+			if (item.domain.indexOf('imgur.com') !== -1 && item.url.indexOf('.gifv' !== -1))
+				item.content = videoTemplate({url: item.url.replace('.gifv', '.mp4')})
+				// item.content = `<video controls muted autoplay loop src="${item.url.replace('.gifv', '.mp4')}">`
+		}
+		
 		items.push(item)
 	})
 	return items

@@ -16,10 +16,10 @@
 		<% _.forEach(items, function(item) { %>
 		<item>
 			<title>${item.title}</title>
-			<link>${item.link}</link>
+			<link>${item.url}</link>
 			<pubDate>${item.pubDate}</pubDate>
 			<content:encoded><![CDATA[
-				<div><a href="${item.permalink}">View Comments or SelfPost / ForceTouch for iOS App</a></div>
+				<div><a href="${item.permalink}">View Comments, (${item.num_comments} comments?)</a></div>
 				<p><small><b>${item.domain}</b> &ndash; posted by <em>${item.author}</em></small></p>
 				${item.content}
 			]]></content:encoded>
