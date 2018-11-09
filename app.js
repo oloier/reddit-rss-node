@@ -68,7 +68,7 @@ const prepareFeedItems = (rdtPost) => {
 		}
 
 		// video oembed? yes please. thx reddit.
-		const videoTemplate = _.template('<video src="<%= url %>" controls muted autoplay loop playsinline>')
+		const videoTemplate = _.template('<video src="<%= url %>" controls="true" muted autoplay="true" loop playsinline="true">')
 		if (item.post_hint && item.post_hint.indexOf(':video') !== -1) {
 			if (item.is_reddit_video && item.reddit_video_url)
 				item.content = videoTemplate({url: item.reddit_video_url})
