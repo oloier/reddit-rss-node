@@ -75,7 +75,7 @@ const prepareFeedItems = (rdtPost) => {
 			post_hint: child.data.post_hint,
 			num_comments: child.data.num_comments,
 			is_reddit_video: child.data.is_reddit_media_domain,
-			reddit_video_url: (child.data.media &&child.data.media.reddit_video) 
+			reddit_video_url: (child.data.media && child.data.media.reddit_video) 
 				? child.data.media.reddit_video.fallback_url : null
 		}
 
@@ -86,15 +86,12 @@ const prepareFeedItems = (rdtPost) => {
 			url = _.escape(url)
 			return `<iframe width=100% height=100% frameborder=0 src="https://oloier.com/r/v/${url}"></iframe>`
 		}
-		
+
 		if (item.post_hint && item.post_hint.indexOf(':video') !== -1) {
 			if (item.is_reddit_video && item.reddit_video_url)
-				item.content = videoTemplate({url: item.reddit_video_url})
+				item.content = videoTemplate(item.reddit_video_url)
 			else item.content = _.unescape(item.secure_embed)
 		}
-
-		// v.redd.it is totally broken and awful. Not worth it.
-		if (item.url.indexOf('/v.redd.it/') !== -1) item.url = item.permalink
 
 		// direct image embedding
 		let exts = ['.jpg', '.png', '.webp', '.gif', '.jpeg']
@@ -114,7 +111,7 @@ const prepareFeedItems = (rdtPost) => {
 		if (item.post_hint && item.post_hint.indexOf('link') !== -1) {
 			// replace gifv with <video> embed of mp4 source URL
 			if (item.domain.indexOf('imgur.com') !== -1 && item.url.indexOf('.gifv' !== -1))
-				item.content = videoTemplate({url: item.url.replace('.gifv', '.mp4')})
+				item.content = videoTemplate(item.url.replace('.gifv', '.mp4'))
 				// item.content = `<video controls muted autoplay loop src="${item.url.replace('.gifv', '.mp4')}">`
 		}
 		
