@@ -27,6 +27,7 @@
 				<div><a href="${item.permalink}">View Comments, (${item.num_comments} comments?)</a></div>
 				<p><small><b>${item.domain}</b> &ndash; posted by <em>${item.author}</em></small></p>
 				${item.content}
+				<div><img src="${item.thumbnail.url || ''}" width="1" height="1" /></div>
 			]]></content:encoded>
 		</item>
 		<% }); %>
