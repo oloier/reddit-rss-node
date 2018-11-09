@@ -6,33 +6,20 @@
 	<title>Video embed</title>
 	<style type="text/css">
 		* {margin: 0; padding:0; box-sizing: border-box}
-		main {
-			position: relative;
-			background-size: cover;
-			background-position: 50% 50%;
-			height: 100vh;
-			z-index: 0;
-		}
+		body {background-color:#262626;}
 		main video {
-			-webkit-transform: translateX(-50%) translateY(-50%);
-			-moz-transform: translateX(-50%) translateY(-50%);
-			-ms-transform: translateX(-50%) translateY(-50%);
-			-o-transform: translateX(-50%) translateY(-50%);
-			transform: translateX(-50%) translateY(-50%);
-			position: absolute;
-			top: 50%;
-			left: 50%;
-			min-width: 100%;
-			min-height: 100%;
-			width: auto;
-			height: auto;
-			z-index: -100;
+			object-fit: contain;
+			width: 100vw;
+			height: 100vh;
+			position: fixed;
+			top: 0;
+			left: 0;
 		}
 	</style>
 </head>
 <body>
 	<main>
-		<video src="${url}" controls muted autoplay loop playsinline></video>
+		<video src="https://i.imgur.com/PREwSbu.mp4" controls muted autoplay loop playsinline></video>
 	</main>
 </body>
 </html>

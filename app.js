@@ -81,16 +81,15 @@ const prepareFeedItems = (rdtPost) => {
 
 		// video oembed? yes please. thx reddit.
 		// const videoTemplate = _.template('<iframe width=100% height=100% frameborder=0 src="data:text/html,<video src=\'<%= url %>\' controls muted autoplay loop playsinline>"></video></iframe>')
-		const videoTemplate = _.template('<video src="<%= url %>" width=800 height=600 controls muted autoplay loop playsinline></video>')
-		// const videoTemplate = (url) => {
-		// 	const vurl = encodeURIComponent(url)
-		// 	return '<iframe width=100% height=100% frameborder=0 '
-		// 	+ `src="https://oloier.com/r/v:${vurl}"></iframe>`
-		// }
+		// const videoTemplate = _.template('<video src="<%= url %>" width=800 height=600 controls muted autoplay loop playsinline></video>')
+		const videoTemplate = (url) => {
+			return '<iframe width=100% height=100% frameborder=0 '
+			+ `src="https://oloier.com/r/v/${encodeURIComponent(url)}"></iframe>`
+		}
 
 		if (item.post_hint && item.post_hint.indexOf(':video') !== -1) {
 			if (item.is_reddit_video && item.reddit_video_url)
-				item.content = videoTemplate({url: item.reddit_video_url})
+				item.content = videoTemplate(item.reddit_video_url)
 			else item.content = _.unescape(item.secure_embed)
 		}
 
@@ -112,7 +111,7 @@ const prepareFeedItems = (rdtPost) => {
 		if (item.post_hint && item.post_hint.indexOf('link') !== -1) {
 			// replace gifv with <video> embed of mp4 source URL
 			if (item.domain.indexOf('imgur.com') !== -1 && item.url.indexOf('.gifv' !== -1))
-				item.content = videoTemplate({url: item.url.replace('.gifv', '.mp4')})
+				item.content = videoTemplate(item.url.replace('.gifv', '.mp4'))
 		}
 		
 		items.push(item)
