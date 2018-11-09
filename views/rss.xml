@@ -28,7 +28,7 @@
 				<p><small><b>${item.domain}</b> &ndash; posted by <em>${item.author}</em></small></p>
 				${item.content}
 				<% if (typeof(item.thumbnail) !== undefined) { %>
-						<img src="${item.thumbnail.url}" style="display:none" width="${10 || item.thumbnail.width}" height="${10 || item.thumbnail.height}"/>
+						<img src="${item.thumbnail.url}" style="display:none" width="${item.thumbnail.width}" height="${1 || item.thumbnail.height}"/>
 				<% } %>
 
 			]]></content:encoded>
