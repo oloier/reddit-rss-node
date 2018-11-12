@@ -62,16 +62,16 @@ const prepareFeedItems = (rdtPost) => {
 		let item = {
 			domain: rdt.data.domain,
 			title: rdt.data.title,
-			pubDate: new Date(rdt.created_utc * 1000),
+			pubDate: new Date(rdt.data.created_utc * 1000),
 			url: rdt.data.url,
 			author: rdt.data.author,
-			permalink: `https://reddit.com${rdt.permalink || ''}`,
-			items: rdtPost.data.children || [],
-			nsfw: (!!rdt.over_18),
+			permalink: `https://reddit.com${rdt.data.permalink || ''}`,
+			// items: rdtPost.data.children || [],
+			nsfw: (!!rdt.data.over_18),
 			secure_embed: rdt.data.secure_media_embed || '',
 			selftext: rdt.data.selftext_html || '',
 			post_hint: rdt.data.post_hint,
-			num_comments: rdt.num_comments,
+			num_comments: rdt.data.num_comments,
 			thumbnail: {
 				url: rdt.data.thumbnail,
 				width: rdt.data.thumbnail_width,
@@ -79,8 +79,7 @@ const prepareFeedItems = (rdtPost) => {
 			}
 		}
 
-		// const videoTemplate = _.template('<iframe width=100% height=100% frameborder=0 src="data:text/html,<video src=\'<%= url %>\' controls muted autoplay loop playsinline>"></video></iframe>')
-		// const videoTemplate = _.template('<video src="<%= url %>" width=800 height=600 controls muted autoplay loop playsinline></video>')
+		// small little self-contained iframe video embedding
 		const videoTemplate = (url, width=640, height=420) => {
 			return `<iframe width=${width} height=${height} frameborder=0 src="https://oloier.com/r/v/${encodeURIComponent(url)}"></iframe>`
 		}
@@ -102,9 +101,11 @@ const prepareFeedItems = (rdtPost) => {
 			item.content = `<img src="${item.url}" alt="">`
 		}
 
-		// do your best, self text... who goddamn cares.
-		if (item.post_hint && item.post_hint.indexOf('self') !== -1)
+		// do your best, self text... who goddamn cares. No post_hint for self. Stupid?
+		if (item.selftext) {
 			item.content = _.unescape(item.selftext)
+			item.thumbnail = null
+		}
 
 		// individual other site exceptions, imgur, instagram, etc.
 		if (item.post_hint && item.post_hint.indexOf('link') !== -1) {
@@ -119,7 +120,7 @@ const prepareFeedItems = (rdtPost) => {
 		// hide NSFW content, or any content for a straight link
 		if (item.nsfw) item.content = ''
 
-
+		console.log(item)
 		items.push(item)
 	})
 	return items
