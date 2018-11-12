@@ -22,7 +22,7 @@
 				<div><a href="${item.permalink}">View Comments, (${item.num_comments} comments?)</a></div>
 				<p><small><b>${item.domain}</b> &ndash; posted by <em>${item.author}</em></small></p>
 				${item.content}
-				<% if (typeof(item.thumbnail) !== undefined) { %><img src="${item.thumbnail.url}" style="display:none" width="${item.thumbnail.width}" height="${1 || item.thumbnail.height}"/><% } %>
+				<% if (typeof(item.thumbnail) !== null) { %><img src="${item.thumbnail.url}" style="display:none" width="${item.thumbnail.width}" height="${item.thumbnail.height}"/><% } %>
 			]]></content:encoded>
 		</item>
 		<% }); %>

@@ -12,6 +12,7 @@
     "dotenv": "^6.1.0",
     "fastify": "^1.13.0",
     "lodash": "^4.17.11",
-    "node-fetch": "^2.2.1"
+    "node-fetch": "^2.2.1",
+    "typy": "^2.0.1"
   }
 }

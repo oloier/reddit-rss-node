@@ -4,7 +4,6 @@ const fastify = require('fastify')({logger: false})
 const _ = require('lodash')
 const fetch = require('node-fetch')
 
-
 fastify.get('/', (request, resp) => {
 	resp.redirect('/r/all/top-day/limit-10')
 })
@@ -59,49 +58,45 @@ const fetchGet = async (url) => {
 
 const prepareFeedItems = (rdtPost) => {
 	let items = []
-	rdtPost.data.children.forEach(child => {
+	rdtPost.data.children.forEach(rdt => {
 		let item = {
-			domain: child.data.domain,
-			title: child.data.title,
-			pubDate: new Date(child.data.created_utc * 1000),
-			url: child.data.url,
-			author: child.data.author,
-			permalink: `https://reddit.com${child.data.permalink}`,
-			items: rdtPost.data.children,
-			nsfw: (!!child.data.over_18),
-			secure_embed: child.data.secure_media_embed.content,
-			selftext: child.data.selftext_html,
-			post_hint: child.data.post_hint,
-			num_comments: child.data.num_comments,
+			domain: rdt.data.domain,
+			title: rdt.data.title,
+			pubDate: new Date(rdt.created_utc * 1000),
+			url: rdt.data.url,
+			author: rdt.data.author,
+			permalink: `https://reddit.com${rdt.permalink || ''}`,
+			items: rdtPost.data.children || [],
+			nsfw: (!!rdt.over_18),
+			secure_embed: rdt.data.secure_media_embed || '',
+			selftext: rdt.data.selftext_html || '',
+			post_hint: rdt.data.post_hint,
+			num_comments: rdt.num_comments,
 			thumbnail: {
-				url: child.data.thumbnail,
-				width: child.data.thumbnail_width,
-				height: child.data.thumbnail_height
-			},
-			is_reddit_video: child.data.is_reddit_media_domain,
-			reddit_video_url: (child.data.media && child.data.media.reddit_video) 
-				? child.data.media.reddit_video.fallback_url : null
-				// ? {
-				// 	url: child.data.media.reddit_video.fallback_url.child,
-				// 	width: ,
-				// 	height: 
-				// } : null
+				url: rdt.data.thumbnail,
+				width: rdt.data.thumbnail_width,
+				height: rdt.data.thumbnail_height
+			}
 		}
-		
-		// oembed: (child.data.media && child.data.media.oembed) ? child.data.media.oembed.html : '',
+		console.log(rdt.thumbnail)
+		// oembed: (rdt.media && rdt.media.oembed) ? rdt.media.oembed.html : '',
 
 		// video oembed? yes please. thx reddit.
 		// const videoTemplate = _.template('<iframe width=100% height=100% frameborder=0 src="data:text/html,<video src=\'<%= url %>\' controls muted autoplay loop playsinline>"></video></iframe>')
 		// const videoTemplate = _.template('<video src="<%= url %>" width=800 height=600 controls muted autoplay loop playsinline></video>')
-		const videoTemplate = (url) => {
-			return '<iframe width=650 height=420 frameborder=0 '
-			+ `src="https://oloier.com/r/v/${encodeURIComponent(url)}"></iframe>`
+		
+		const videoTemplate = (url, width=640, height=420) => {
+			return `<iframe width=${width} height=${height} frameborder=0 src="https://oloier.com/r/v/${encodeURIComponent(url)}"></iframe>`
 		}
 
-		if (item.post_hint && item.post_hint.indexOf(':video') !== -1) {
-			if (item.is_reddit_video && item.reddit_video_url)
-				item.content = videoTemplate(item.reddit_video_url)
-			else item.content = _.unescape(item.secure_embed)
+		// rich:video is anything with oembed
+		if (item.post_hint == 'rich:video')
+			item.content = _.unescape(item.secure_embed.content)
+
+		// hosted:video is any reddit-hosted video
+		if (item.post_hint == 'hosted:video') {
+			let rv = rdt.data.secure_media.reddit_video
+			item.content = videoTemplate(rv.fallback_url, rv.width, rv.height)
 		}
 
 		// direct image embedding
@@ -113,18 +108,22 @@ const prepareFeedItems = (rdtPost) => {
 
 		// do your best, self text... who goddamn cares.
 		if (item.post_hint && item.post_hint.indexOf('self') !== -1)
-			item.content = item.selftext
+			item.content = _.unescape(item.selftext)
+
+		// individual other site exceptions, imgur, instagram, etc.
+		if (item.post_hint && item.post_hint.indexOf('link') !== -1) {
+			if (item.domain.indexOf('imgur.com') !== -1 && item.url.indexOf('.gifv' !== -1)) {
+				// replace gifv with <video> embed of mp4 source URL
+				//	 item.content = videoTemplate(item.url.replace('.gifv', '.mp4'))
+				let rvp = rdt.data.preview.reddit_video_preview
+				item.content = videoTemplate(rvp.fallback_url, rvp.width, rvp.height)
+			}
+		}
 
 		// hide NSFW content, or any content for a straight link
 		if (item.nsfw) item.content = ''
 
-		// individual other site exceptions, imgur, instagram, etc.
-		if (item.post_hint && item.post_hint.indexOf('link') !== -1) {
-			// replace gifv with <video> embed of mp4 source URL
-			if (item.domain.indexOf('imgur.com') !== -1 && item.url.indexOf('.gifv' !== -1))
-				item.content = videoTemplate(item.url.replace('.gifv', '.mp4'))
-		}
-		
+
 		items.push(item)
 	})
 	return items
