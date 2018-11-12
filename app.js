@@ -73,7 +73,7 @@ const prepareFeedItems = (rdtPost) => {
 			post_hint: rdt.data.post_hint,
 			num_comments: rdt.data.num_comments,
 			thumbnail: {
-				url: rdt.data.thumbnail,
+				url: (rdt.data.thumbnail !== 'self') ? rdt.data.thumbnail : null,
 				width: rdt.data.thumbnail_width,
 				height: rdt.data.thumbnail_height
 			}
