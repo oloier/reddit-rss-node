@@ -136,7 +136,7 @@ const prepareFeedItems = (rdtPost) => {
 			}
 		}
 		// hide NSFW content, or any content for a straight link
-		if (item.nsfw) item.content = ''
+		if (item.nsfw) item.content = '<p><small>NSFW content, preview removed</small></p>'
 
 		items.push(item)
 	})
