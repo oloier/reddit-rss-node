@@ -19,8 +19,7 @@
 			<link>${item.url}</link>
 			<pubDate>${item.pubDate}</pubDate>
 			<content:encoded><![CDATA[
-				<div><a href="${item.permalink}">View ${item.num_comments} comments</a></div>
-				<p><small><b>${item.domain}</b> &ndash; posted by <em>${item.author}</em></small></p>
+				<div><a href="${item.permalink}">View ${item.num_comments} comments</a> &ndash; <small><b>${item.domain}</b> &ndash; posted by <em>${item.author}</em></small></div>
 				${item.content}
 				<% if (item.thumbnail.url !== null) { %><p><p>
 				<p>Thumbnail attachment:</p>
