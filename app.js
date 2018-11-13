@@ -131,6 +131,8 @@ const prepareFeedItems = (rdtPost) => {
 			// old way: item.url.replace('gifv', 'mp4')
 			if (item.domain.indexOf('imgur.com') !== -1) {
 				
+				// follow reddit's 'preview' (mirror) of gifv videos, because
+				// they're just terrible
 				if (item.url.indexOf('.gifv') !== -1) {
 					let rvp = rdt.data.preview.reddit_video_preview
 					item.content = videoTemplate(rvp.fallback_url, rvp.width, rvp.height)
