@@ -22,10 +22,10 @@
 				<div><a href="${item.permalink}">View ${item.num_comments} comments</a></div>
 				<p><small><b>${item.domain}</b> &ndash; posted by <em>${item.author}</em></small></p>
 				${item.content}
-
-				<p><p>
+				<% if (item.thumbnail.url !== null) { %><p><p>
 				<p>Thumbnail attachment:</p>
-				<% if (typeof(item.thumbnail.url) !== null) { %><img src="${item.thumbnail.url}" style="display:none; visible: hidden; opacity:0;" aria-hidden="hidden" hidden width="${(item.thumbnail.width)}" height="${(item.thumbnail.height)}"/><% } %>
+				<img src="${item.thumbnail.url}" width="${(item.thumbnail.width)}" height="${(item.thumbnail.height)}"/>
+				<% } %>
 			]]></content:encoded>
 		</item>
 		<% }); %>
