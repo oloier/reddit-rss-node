@@ -59,13 +59,15 @@ const fetchGet = async (url) => {
 	}
 }
 
-// small self-contained iframe video embedding
-const videoTemplate = (url, width = 640, height = 420) => {
-	return `<iframe width=${width} height=${height} frameborder=0 src="https://oloier.com/r/v/${encodeURIComponent(url)}"></iframe>`
-}
 
 
 const prepareFeedItems = (rdtPost) => {
+	
+	// small self-contained iframe video embedding
+	const videoTemplate = (url, width = 640, height = 420) => {
+		return `<iframe width=${width} height=${height} frameborder=0 src="https://oloier.com/r/v/${encodeURIComponent(url)}"></iframe>`
+	}
+	
 	// embeddable image extensions
 	const exts = ['.jpg', '.png', '.webp', '.gif', '.jpeg']
 
@@ -111,20 +113,21 @@ const prepareFeedItems = (rdtPost) => {
 		}
 
 		// reddit.self stuff; encoded HTML. Strip out 
-		if (item.selftext) {
+		if (item.post_hint == 'self') {
 			item.selftext = _.unescape(item.selftext)
 			// comments sometimes end up rendering in feed clients; remove 'em.
-			item.selftext = item.selftext.replace('<!-- SC_OFF -->', '').replace('<!-- SC_ON -->', '')
+			item.content = item.selftext.replace(/<!--(.*?)-->/, '')
 		}
 		
 		// direct image embedding
 		if (item.post_hint && item.post_hint.indexOf('image') !== -1 ||
 			item.url.containsAny(exts)) {
-			item.content = `<img src="${item.url}" alt="">`
+			item.content = `<img src="${item.url}" alt=""/>`
 		}
 
 		// individual other site exceptions, imgur, instagram, etc.
 		if (item.post_hint && item.post_hint.indexOf('link') !== -1) {
+
 			// old way: item.url.replace('gifv', 'mp4')
 			if (item.domain.indexOf('imgur.com') !== -1) {
 				
@@ -133,12 +136,11 @@ const prepareFeedItems = (rdtPost) => {
 					item.content = videoTemplate(rvp.fallback_url, rvp.width, rvp.height)
 				}
 
-				// if imgur link is not a gifv and not a direct link,
-				// just force an image extension because it's faster in 
-				// this case than calling out to their API. It's also 
-				// VERY lazy, but we actually don't need to go that far.
+				// force extension to url on imgur page links; galleries are
+				// unsupported, but they're so rare.
 				if (!item.url.containsAny(exts)) 
 					item.content = `<img src="${item.url + exts[0]}" alt="">`
+
 			}
 		}
 		// hide and label NSFW content
