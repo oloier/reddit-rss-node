@@ -96,7 +96,8 @@ const prepareFeedItems = (rdtPost) => {
 		//
 
 		// remove thumbnails for appropriate post_hints
-		if (item.post_hint.containsAny(['self', 'image', 'link']))
+		if (item.post_hint.containsAny(['self', 'image', 'link'])
+			|| item.thumbnail.url == 'default')
 			item.thumbnail = null
 
 		// rich:video is anything with oembed
