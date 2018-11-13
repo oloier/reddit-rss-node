@@ -147,7 +147,7 @@ const prepareFeedItems = (rdtPost) => {
 		//
 		// end content customizations
 		//
-
+		
 		items.push(item)
 	})
 	return items
