@@ -1,15 +1,13 @@
-require('dotenv').config()
+require('dotenv').config() // for host:PORT
 const fs = require('fs')
-const fastify = require('fastify')({
-	logger: false
-})
+const fastify = require('fastify')({logger: false})
 const _ = require('lodash')
 const fetch = require('node-fetch')
 
-fastify.get('/', (request, resp) => {
-	resp.redirect('/r/all/top-day/limit-10')
-})
+// redirect root to default feed
+fastify.get('/', (request, resp) => {resp.redirect('/r/all/top-day/limit-10')})
 
+// setup our video embed iframe route
 fastify.get('/v/:url', (request, resp) => {
 	const url = decodeURIComponent(request.params.url) || ''
 
@@ -18,21 +16,22 @@ fastify.get('/v/:url', (request, resp) => {
 	resp.header('x-xss-protection', '1')
 	resp.header('x-content-type-options', 'nosniff')
 	resp.header('strict-transport-security', 'max-age=31536000')
-	// invoke lodash template string, send as response
-	resp.send(render('video-iframe.html', {
-		url
-	}))
+	// build template via lodash
+	resp.send(render('video-iframe.html', {url}))
 })
 
+// [host]/subreddit/top-[day,month,year,all]/limit-[itemCount]
 fastify.get('/:subreddit/top-:time/limit-:limit', async (request, resp) => {
 	try {
+		// include default values
 		const subreddit = request.params.subreddit || 'all'
 		const time = request.params.time || 'day'
 		const limit = request.params.limit || 5
 
+		// static json feed URL; may it never change 🤞 
 		const feed = `https://www.reddit.com/r/${subreddit}/top/.json?sort=top&t=${time}&limit=${limit}`
-		// console.info(`URL request: ${feed}`)
 
+		// fetch our feed, build into object
 		const json = await fetchGet(feed)
 		const rssObjects = prepareFeedItems(json)
 		const rssMomma = {
@@ -41,7 +40,7 @@ fastify.get('/:subreddit/top-:time/limit-:limit', async (request, resp) => {
 			items: rssObjects
 		}
 
-		// invoke lodash template string, send as responsenpm s
+		// build template via lodash
 		resp.header('content-type', 'application/rss+xml; charset=utf-8')
 		resp.send(render('rss.xml', rssMomma))
 	} catch (ex) {
@@ -49,6 +48,7 @@ fastify.get('/:subreddit/top-:time/limit-:limit', async (request, resp) => {
 	}
 })
 
+// utilize node-fetch for retrieving reddit's json feed
 const fetchGet = async (url) => {
 	try {
 		const response = await fetch(url)
@@ -59,7 +59,17 @@ const fetchGet = async (url) => {
 	}
 }
 
+// small self-contained iframe video embedding
+const videoTemplate = (url, width = 640, height = 420) => {
+	return `<iframe width=${width} height=${height} frameborder=0 src="https://oloier.com/r/v/${encodeURIComponent(url)}"></iframe>`
+}
+
+
 const prepareFeedItems = (rdtPost) => {
+	// embeddable image extensions
+	const exts = ['.jpg', '.png', '.webp', '.gif', '.jpeg']
+
+	// crimp the reddit JSON object to a simpler format
 	let items = []
 	rdtPost.data.children.forEach(rdt => {
 		let item = {
@@ -69,24 +79,25 @@ const prepareFeedItems = (rdtPost) => {
 			url: rdt.data.url,
 			author: rdt.data.author,
 			permalink: `https://reddit.com${rdt.data.permalink || ''}`,
-			// items: rdtPost.data.children || [],
 			nsfw: (!!rdt.data.over_18),
 			secure_embed: rdt.data.secure_media_embed || '',
 			selftext: rdt.data.selftext_html || '',
-			post_hint: rdt.data.post_hint || 'self',
+			post_hint: rdt.data.post_hint || 'self', 
 			num_comments: rdt.data.num_comments,
 			thumbnail: {
-				url: (rdt.data.thumbnail !== 'self') ? rdt.data.thumbnail : null,
+				url: rdt.data.thumbnail,
 				width: rdt.data.thumbnail_width,
 				height: rdt.data.thumbnail_height
 			}
 		}
+		
+		//
+		// content customization, specific for web-based RSS readers (inoreader)
+		//
 
-
-		// small little self-contained iframe video embedding
-		const videoTemplate = (url, width = 640, height = 420) => {
-			return `<iframe width=${width} height=${height} frameborder=0 src="https://oloier.com/r/v/${encodeURIComponent(url)}"></iframe>`
-		}
+		// remove thumbnails for appropriate post_hints
+		if (item.post_hint.containsAny(['self', 'image', 'link']))
+			item.thumbnail = null
 
 		// rich:video is anything with oembed
 		if (item.post_hint == 'rich:video')
@@ -98,23 +109,19 @@ const prepareFeedItems = (rdtPost) => {
 			item.content = videoTemplate(rv.fallback_url, rv.width, rv.height)
 		}
 
-		// embeddable image extensions
-		let exts = ['.jpg', '.png', '.webp', '.gif', '.jpeg']
+		// reddit.self stuff; encoded HTML. Strip out 
+		if (item.selftext) {
+			item.selftext = _.unescape(item.selftext)
+			// comments sometimes end up rendering in feed clients; remove 'em.
+			item.selftext = item.selftext.replace('<!-- SC_OFF -->', '').replace('<!-- SC_ON -->', '')
+		}
 		
 		// direct image embedding
 		if (item.post_hint && item.post_hint.indexOf('image') !== -1 ||
 			item.url.containsAny(exts)) {
 			item.content = `<img src="${item.url}" alt="">`
-			item.thumbnail.url = null
 		}
 
-		// do your best, self text... who goddamn cares. No post_hint for self. Stupid?
-		if (item.selftext) {
-			item.selftext = item.selftext.replace('<!-- SC_OFF -->', '').replace('<!-- SC_ON -->', '')
-			item.content = _.unescape(item.selftext)
-			item.thumbnail.url = null
-		}
-		
 		// individual other site exceptions, imgur, instagram, etc.
 		if (item.post_hint && item.post_hint.indexOf('link') !== -1) {
 			// old way: item.url.replace('gifv', 'mp4')
@@ -129,32 +136,36 @@ const prepareFeedItems = (rdtPost) => {
 				// just force an image extension because it's faster in 
 				// this case than calling out to their API. It's also 
 				// VERY lazy, but we actually don't need to go that far.
-				if (!item.url.containsAny(exts)) {
+				if (!item.url.containsAny(exts)) 
 					item.content = `<img src="${item.url + exts[0]}" alt="">`
-					item.thumbnail.url = null
-				}
 			}
 		}
-		// hide NSFW content, or any content for a straight link
-		if (item.nsfw) item.content = '<p><small>NSFW content, preview removed</small></p>'
+		// hide and label NSFW content
+		if (item.nsfw) 
+			item.content = '<p><small>NSFW, preview removed</small></p>'
+
+		//
+		// end content customizations
+		//
 
 		items.push(item)
 	})
 	return items
 }
 
-// if string contains array substr
+// if string contains array substr : string.containsAny(['str1', 'str2', 'str3'])
 String.prototype.containsAny = String.prototype.containsAny || function(arr) {
-	for (var i = 0; i < arr.length; i++) if (this.indexOf(arr[i]) > -1) return true
+	for (var i = 0; i < arr.length; i++) 
+		if (this.indexOf(arr[i]) > -1) return true
 	return false
 }
 
-
-// lodash template compilation
+// basic lodash template compilation
 function render(view, ctx = {}) {
 	return _.template(fs.readFileSync(`./views/${view}`))(ctx)
 }
 
+// start fastify server
 fastify.listen(process.env.PORT, (err, address) => {
 	if (err) throw err
 	console.info(`server listening on ${address}`)

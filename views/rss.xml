@@ -21,7 +21,7 @@
 			<content:encoded><![CDATA[
 				<div><a href="${item.permalink}">View ${item.num_comments} comments</a> &ndash; <small><b>${item.domain}</b> &ndash; posted by <em>${item.author}</em></small></div>
 				${item.content}
-				<% if (item.thumbnail.url !== null) { %><p><p>
+				<% if (item.thumbnail != null) { %><p><p>
 				<p>Thumbnail attachment:</p>
 				<img src="${item.thumbnail.url}" width="${(item.thumbnail.width)}" height="${(item.thumbnail.height)}"/>
 				<% } %>
