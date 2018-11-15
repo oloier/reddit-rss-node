@@ -60,11 +60,11 @@ const fetchGet = async (url) => {
 }
 
 
-
 const prepareFeedItems = (rdtPost) => {
 	
 	// small self-contained iframe video embedding
 	const videoTemplate = (url, width = 640, height = 420) => {
+		if (height > 900) height = 900
 		return `<iframe width=${width} height=${height} frameborder=0 src="https://oloier.com/r/v/${encodeURIComponent(url)}"></iframe>`
 	}
 	
