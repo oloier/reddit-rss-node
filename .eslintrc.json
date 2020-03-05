@@ -7,27 +7,48 @@
     },
     "extends": "eslint:recommended",
     "parserOptions": {
-        "ecmaVersion": 2017,
+        "ecmaVersion": 2018,
         "sourceType": "module"
     },
     "rules": {
-        "indent": [
-            "error",
-            "tab"
-        ],
-        "linebreak-style": [
-            "error",
-            "windows"
-        ],
-        "quotes": [
-            "warn",
-            "single"
-        ],
-		"semi": [
-            "warn",
-            "never"
-		],
+		"array-bracket-newline": ["error", "consistent"],
+		"array-element-newline": ["error", "consistent"],
+		"arrow-parens": ["error", "as-needed", { "requireForBlockBody": true }],
+		// "arrow-parens": 2,
+		"arrow-spacing": 2,
+		"block-scoped-var": 2,
+		"brace-style": ["error", "stroustrup"],
+		"camelcase": 1,
+		"capitalized-comments": ["warn", "never"],
+		"comma-dangle": ["error", "always-multiline"],
+		"curly": ["error", "all"],
+		"dot-location": ["error", "property"],
+		"dot-notation": 2,
+		"global-require": 2,
+		"handle-callback-err": 2,
+		"key-spacing": 2,
+		"keyword-spacing": 2,
+		"linebreak-style": ["error", "unix"],
 		"no-console": "off",
-		"no-unused-vars": "warn"
+		"no-const-assign": 2,
+		"no-multi-spaces": 2,
+		"no-useless-escape": 2,
+		"no-useless-return": 2,
+		"no-var": 2,
+		"prefer-arrow-callback": 2,
+		"prefer-const": 2,
+		"prefer-promise-reject-errors": 2,
+		"quote-props": ["error", "consistent-as-needed"],
+		"quotes": ["error", "double", {"avoidEscape": true, "allowTemplateLiterals": true}],
+		"require-await": 2,
+		"semi": ["warn","never"],
+		"space-before-function-paren": 0,
+		"space-in-parens": 2,
+		"space-infix-ops": 2,
+		"spaced-comment": 2,
+		"template-curly-spacing": ["error", "never"],
+        "indent": ["error", "tab"],
+        "no-unused-vars": "warn",
+        "object-property-newline": [2, { "allowMultiplePropertiesPerLine": true }]
     }
 }
