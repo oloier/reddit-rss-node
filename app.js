@@ -117,7 +117,7 @@ const prepareFeedItems = (rdtPost) => {
 		if (item.post_hint == "rich:video") {
 			item.content = _.unescape(item.secure_embed.content)
 			if (item.content.containsAny(["youtube.com/embed/"])) {
-				item.content.replace("&enablejsapi=1", "&enablejsapi=1&modestbranding=1&ytp-pause-overlay=0")
+				item.content.replace("enablejsapi=1", "enablejsapi=1&modestbranding=1&ytp-pause-overlay=0")
 			}
 		}
 
