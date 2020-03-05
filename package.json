@@ -4,14 +4,14 @@
   "description": "A simple reddit scraper to reformat their ugly RSS feeds",
   "main": "app.js",
   "scripts": {
-    "start": "nodemon app.js"
+    "start": "node app.js"
   },
   "author": "Scott Oloier",
   "license": "ISC",
   "dependencies": {
-    "dotenv": "^6.1.0",
-    "fastify": "^1.13.0",
-    "lodash": "^4.17.11",
-    "node-fetch": "^2.2.1"
+    "dotenv": "^6.2.0",
+    "fastify": "^1.14.6",
+    "lodash": "^4.17.15",
+    "node-fetch": "^2.6.0"
   }
 }
