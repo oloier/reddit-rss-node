@@ -75,7 +75,7 @@ const prepareFeedItems = (rdtPost) => {
 		if (height > 900) {
 			height = 900
 		}
-		return `<iframe width=${width} height=${height} frameborder=0 src="https://oloier.com/r/v/${encodeURIComponent(url)}"></iframe>`
+		return `<iframe width=${width} height=${height} frameborder=0 src="https://www.oloier.com/r/v/${encodeURIComponent(url)}"></iframe>`
 	}
 	
 	// embeddable image extensions
