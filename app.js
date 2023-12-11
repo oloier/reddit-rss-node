@@ -5,7 +5,7 @@ const app = express()
 const _ = require('lodash')
 app.disable('x-powered-by')
 
-app.get('/r/:subreddit/top-:time/limit-:limit', async (req, res) => {
+app.get('/:subreddit/top-:time/limit-:limit', async (req, res) => {
 	try {
 		const subreddit = req.params.subreddit
 		const time = req.params.time
@@ -38,12 +38,6 @@ const fetchGet = async (url) => {
 		console.log(`${ex}, ${ex.stack}`)
 	}
 }
-const htmlDecode = (input) => {
-	const doc = new DOMParser().parseFromString(input, "text/html");
-	return doc.documentElement.textContent;
-}
-
-
 const prepareFeedItems = (rdtPost) => {
 	let items = []
 	rdtPost.data.children.forEach(child => {
@@ -64,7 +58,7 @@ const prepareFeedItems = (rdtPost) => {
 
 		// video oembed? yes please. thx reddit.
 		if (item.post_hint.indexOf(':video') !== -1) 
-			item.content = htmlDecode(item.secure_embed)
+			item.content = _.unescape(item.secure_embed)
 		
 		if (item.link.indexOf('/v.redd.it/') !== -1) item.link = item.permalink
 
