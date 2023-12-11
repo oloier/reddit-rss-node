@@ -3,7 +3,6 @@ const fs = require('fs')
 const express = require('express')
 const app = express()
 const _ = require('lodash')
-const fetch = require('node-fetch')
 app.disable('x-powered-by')
 
 app.get('/r/:subreddit/top-:time/limit-:limit', async (req, res) => {
@@ -39,6 +38,11 @@ const fetchGet = async (url) => {
 		console.log(`${ex}, ${ex.stack}`)
 	}
 }
+const htmlDecode = (input) => {
+	const doc = new DOMParser().parseFromString(input, "text/html");
+	return doc.documentElement.textContent;
+}
+
 
 const prepareFeedItems = (rdtPost) => {
 	let items = []
@@ -55,12 +59,12 @@ const prepareFeedItems = (rdtPost) => {
 			secure_embed: child.data.secure_media_embed.content,
 			oembed: (child.data.media && child.data.media.oembed) ? child.data.media.oembed.html : '',
 			selftext: child.data.selftext_html,
-			post_hint: child.data.post_hint
+			post_hint: (child.data.post_hint) ? child.data.post_hint : ''
 		}
 
 		// video oembed? yes please. thx reddit.
 		if (item.post_hint.indexOf(':video') !== -1) 
-			item.content = _.unescape(item.secure_embed)
+			item.content = htmlDecode(item.secure_embed)
 		
 		if (item.link.indexOf('/v.redd.it/') !== -1) item.link = item.permalink
 
